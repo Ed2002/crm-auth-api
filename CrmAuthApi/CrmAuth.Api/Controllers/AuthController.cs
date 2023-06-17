@@ -10,10 +10,26 @@ namespace CrmAuth.Api.Controllers
     public class AuthController : Controller
     {
         private ListUserIdsHandler ListUserIdsHandler;
+        private LoginHandler LoginHandler;
         public AuthController(IConfiguration config)
         {
             MySqlConnection connection = new(config.GetConnectionString("crm"));
             ListUserIdsHandler = new ListUserIdsHandler(connection);
+            LoginHandler = new LoginHandler(connection);
+        }
+
+        [HttpPost("Login")]
+        public IActionResult Login([FromBody] string Email)
+        {
+            try
+            {
+                bool r = LoginHandler.Handle(Email);
+                return Ok(r);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         [HttpGet("ListIds")]
