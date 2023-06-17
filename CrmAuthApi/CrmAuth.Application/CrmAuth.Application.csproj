@@ -10,4 +10,9 @@
     <PackageReference Include="MySql.Data" Version="8.0.33" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CrmAuth.Domain\CrmAuth.Domain.csproj" />
+    <ProjectReference Include="..\CrmAuth.Infra\CrmAuth.Infra.csproj" />
+  </ItemGroup>
+
 </Project>
