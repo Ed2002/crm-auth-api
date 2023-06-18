@@ -1,7 +1,7 @@
-﻿using CrmAuth.Application.Handlers;
+﻿using CrmAuth.Application.Commands;
+using CrmAuth.Application.Handlers;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace CrmAuth.Api.Controllers
 {
@@ -9,37 +9,36 @@ namespace CrmAuth.Api.Controllers
     [Route("[controller]")]
     public class AuthController : Controller
     {
-        private ListUserIdsHandler ListUserIdsHandler;
         private LoginHandler LoginHandler;
+        private RegisterHandler RegisterHandler;
         public AuthController(IConfiguration config)
         {
             MySqlConnection connection = new(config.GetConnectionString("crm"));
-            ListUserIdsHandler = new ListUserIdsHandler(connection);
             LoginHandler = new LoginHandler(connection);
+            RegisterHandler = new RegisterHandler(connection);
+        }
+
+        [HttpPost("Register")]
+        public IActionResult Register([FromBody] RegisterCommand request)
+        {
+            try
+            {
+                var r = RegisterHandler.Handle(request);
+                return Ok(r);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] string Email)
+        public IActionResult Login([FromBody] LoginCommand request)
         {
             try
             {
-                bool r = LoginHandler.Handle(Email);
-                return Ok(r);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-
-        [HttpGet("ListIds")]
-        public IActionResult Index()
-        {
-            try
-            {
-                var list = ListUserIdsHandler.Handle();
-
-                return Ok(list);
+                string result = LoginHandler.Handle(request);
+                return Ok(result);
             }
             catch (Exception ex)
             {
