@@ -37,7 +37,7 @@ namespace CrmAuth.Api.Controllers
         {
             try
             {
-                string result = LoginHandler.Handle(request);
+                var result = LoginHandler.Handle(request);
                 return Ok(result);
             }
             catch (Exception ex)

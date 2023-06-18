@@ -1,5 +1,6 @@
 ﻿using CrmAuth.Application.Commands;
 using CrmAuth.Domain.Entities;
+using CrmAuth.Domain.Model;
 using CrmAuth.Domain.Repositories;
 using CrmAuth.Infra;
 using CrmAuth.Utils;
@@ -21,20 +22,28 @@ namespace CrmAuth.Application.Handlers
             util = new();
         }
 
-        public string Handle(LoginCommand request)
+        public ResultModel<string> Handle(LoginCommand request)
         {
             try
             {
+                ResultModel<string> result = new();
+
                 var user = userRepository.SearchUserByEmail(request.Email).Result;
 
                 if (!util.VerifyPasswordHash(request.Password, Convert.FromBase64String(user.Password), Convert.FromBase64String(user.PasswordSalt)))
                 {
-                    return "User Invalid";
+                    result.Success = false;
+                    result.Model = "Senha Invalida!";
+                    return result;
+
                 }
 
                 string Token = CreateToken(user);
 
-                return Token;
+                result.Success = true;
+                result.Model = Token;
+
+                return result;
             }
             catch(Exception ex)
             {
