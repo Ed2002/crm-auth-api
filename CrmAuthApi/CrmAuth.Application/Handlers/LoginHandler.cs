@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CrmAuth.Application.Handlers
 {
@@ -15,11 +17,13 @@ namespace CrmAuth.Application.Handlers
     {
         private IUserRepository userRepository;
         private Util util;
+        private string token;
 
-        public LoginHandler(MySqlConnection connection)
+        public LoginHandler(MySqlConnection connection, string _token)
         {
             userRepository = new UserRepository(connection);
             util = new();
+            token = _token;
         }
 
         public ResultModel<string> Handle(LoginCommand request)
@@ -53,28 +57,27 @@ namespace CrmAuth.Application.Handlers
 
         private string CreateToken(User user)
         {
-            byte[] keyBytes = new byte[64];
-
             var claims = new List<Claim>
             {
                 new Claim("sub", user.Id.ToString()),
-                new Claim("nome", user.Nome),
-                new Claim("email", user.Email),
+                new Claim("name", user.Nome),
+                new Claim("email", user.Email)
             };
 
-            var key = new SymmetricSecurityKey(keyBytes);
+            // Geração da chave secreta
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token));
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(20),
-                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512)
-            };
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var payload = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(40),
+                signingCredentials: creds
+            );
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var MYtoken = tokenHandler.CreateToken(tokenDescriptor);
-
-            string tokenString = tokenHandler.WriteToken(MYtoken);
+            
+            var tokenString = tokenHandler.WriteToken(payload);
 
             return tokenString;
         }

@@ -14,7 +14,7 @@ namespace CrmAuth.Api.Controllers
         public AuthController(IConfiguration config)
         {
             MySqlConnection connection = new(config.GetConnectionString("crm"));
-            LoginHandler = new LoginHandler(connection);
+            LoginHandler = new LoginHandler(connection, config.GetSection("Token").Value);
             RegisterHandler = new RegisterHandler(connection);
         }
 
