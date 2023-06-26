@@ -1,4 +1,5 @@
 ﻿using CrmAuth.Application.Commands;
+using CrmAuth.Domain.Model;
 using CrmAuth.Domain.Repositories;
 using CrmAuth.Domain.Util;
 using CrmAuth.Infra;
@@ -18,7 +19,7 @@ namespace CrmAuth.Application.Handlers
             util = new();
         }
 
-        public long Handle(RegisterCommand request)
+        public ResultModel<long> Handle(RegisterCommand request)
         {
             try
             {
@@ -31,11 +32,11 @@ namespace CrmAuth.Application.Handlers
 
                 long IdRegister = userRepository.RegisterUser(request.Email, Convert.ToBase64String(p.PasswordHash), Convert.ToBase64String(p.PasswordSalt)).Result;
 
-                return IdRegister;
+                return new Result<long>().CreateSucess(IdRegister);
             }
             catch (Exception ex)
             {
-                throw new Exception("" + ex);
+                return new Result<long>().CreateErro(ex.Message);
             }
         }
     }

@@ -36,22 +36,16 @@ namespace CrmAuth.Application.Handlers
 
                 if (!util.VerifyPasswordHash(request.Password, Convert.FromBase64String(user.Password), Convert.FromBase64String(user.PasswordSalt)))
                 {
-                    result.Success = false;
-                    result.Model = "Senha Invalida!";
-                    return result;
-
+                    throw new Exception("Senha Invalida!");
                 }
 
                 string Token = CreateToken(user);
 
-                result.Success = true;
-                result.Model = Token;
-
-                return result;
+                return new Result<string>().CreateSucess(Token);
             }
             catch(Exception ex)
             {
-                throw new Exception("" + ex);
+                return new Result<string>().CreateErro(ex.Message);
             }
         }
 
