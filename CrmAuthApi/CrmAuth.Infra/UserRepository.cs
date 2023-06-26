@@ -21,8 +21,8 @@ namespace CrmAuth.Infra
             {
                 StringBuilder query = new();
 
-                query.Append(" insert into user (email,password,password_salt) ");
-                query.Append(" values(@email,@password,@password_salt); ");
+                query.Append(" insert into user (email,password,password_salt, status) ");
+                query.Append(" values(@email,@password,@password_salt, 1); ");
                 query.Append(" SELECT LAST_INSERT_ID(); ");
 
                 DynamicParameters parameters = new();
