@@ -30,7 +30,7 @@ namespace CrmAuth.Application.Handlers
 
                 Password p = util.CreatePasswordHash(request.Password);
 
-                long IdRegister = userRepository.RegisterUser(request.Email, Convert.ToBase64String(p.PasswordHash), Convert.ToBase64String(p.PasswordSalt)).Result;
+                long IdRegister = userRepository.RegisterUser(request.Name, request.Email, Convert.ToBase64String(p.PasswordHash), Convert.ToBase64String(p.PasswordSalt)).Result;
 
                 return new Result<long>().CreateSucess(IdRegister);
             }

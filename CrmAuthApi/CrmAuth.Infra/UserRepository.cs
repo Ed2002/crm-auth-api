@@ -15,18 +15,19 @@ namespace CrmAuth.Infra
             _connection = connection;
         }
 
-        public async Task<long> RegisterUser(string Email, string Passoword, string PasswordSalt)
+        public async Task<long> RegisterUser(string Name, string Email, string Passoword, string PasswordSalt)
         {
             try
             {
                 StringBuilder query = new();
 
-                query.Append(" insert into user (email,password,password_salt, status) ");
-                query.Append(" values(@email,@password,@password_salt, 1); ");
+                query.Append(" insert into user (name,email,password,password_salt, status) ");
+                query.Append(" values(@name, @email,@password,@password_salt, 1); ");
                 query.Append(" SELECT LAST_INSERT_ID(); ");
 
                 DynamicParameters parameters = new();
 
+                parameters.Add("name", Name);
                 parameters.Add("email", Email);
                 parameters.Add("password", Passoword);
                 parameters.Add("password_salt", PasswordSalt);
